@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ContactService } from '../services/contact.service';
 import { Contact } from '../models/Contact';
+import { ToastService } from '../services/toast.service';
+import { ToastType } from '../models/toast-configuration.model';
 
 @Component({
   selector: 'app-contact-list',
@@ -12,7 +14,6 @@ export class ContactListComponent implements OnInit {
   currentContact: Contact | undefined;
   action: string = "";
   constructor(private contactService: ContactService) {
-
   }
 
   ngOnInit(): void {
