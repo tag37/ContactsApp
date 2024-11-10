@@ -2,7 +2,12 @@
 {
     public class ErrorResponse
     {
-        public string Status { get; set; }
-        public string Detail { get; set; }
+        public ErrorResponse(string status, string details)
+        {
+            Status = status;
+            Details = details;
+        }
+        public string Status { get; }
+        public string Details { get; }
     }
 }

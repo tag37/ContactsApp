@@ -11,6 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
+
 builder.Services.AddMvc(opts => opts.Filters.Add(typeof(ExceptionFilter)));
 
 builder.Services.AddSpaStaticFiles(configuration =>
@@ -37,6 +45,17 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseSpaStaticFiles();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contact App");
+        c.RoutePrefix = "swagger";
+    });
+}
+
 app.UseRouting();
 
 app.UseEndpoints(routes =>
@@ -57,8 +76,10 @@ app.UseSpa(spa =>
     if (app.Environment.IsDevelopment())
     {
         spa.UseAngularCliServer(npmScript: "start");
-        //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+        //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");        
     }
 });
 
+
 app.Run();
+

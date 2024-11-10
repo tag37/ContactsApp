@@ -8,8 +8,7 @@ const routes: Routes = [
   { path: 'contacts', component: ContactListComponent },
   { path: 'contacts/new', component: ContactFormComponent },
   { path: 'contacts/edit/:id', component: ContactFormComponent },
-  // Route for creating new contact
-  { path: '**', redirectTo: '' }  // Route for creating new contact
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({
