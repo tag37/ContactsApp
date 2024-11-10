@@ -1,0 +1,11 @@
+.toast-container {
+  z-index: 1050;
+  top: 3.5rem;
+  right: 2rem;
+  min-width: 30rem;
+  max-width: 30rem;
+}
+
+.toast.show {
+  display: block;
+}
