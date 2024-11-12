@@ -43,8 +43,10 @@ namespace ContactsApp.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public IActionResult Get(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(id) || !int.TryParse(id, out _))
+            {
                 return BadRequest("Invalid contact id.");
+            }
 
             var contact = ContactRepository.GetById(id);
 
@@ -64,6 +66,10 @@ namespace ContactsApp.Controllers
         [ProducesResponseType(typeof(ContactResponseDto), 200)]
         public IActionResult Post([FromBody] ContactRequestDto requestDto)
         {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var contact = Mapper.Map<Contact>(requestDto);
             contact = ContactRepository.Insert(contact);
             return Ok(Mapper.Map<ContactResponseDto>(contact));
@@ -73,18 +79,29 @@ namespace ContactsApp.Controllers
         /// Updates the information of an existing contact identified by its unique ID.
         /// </summary>
         /// <param name="id">The unique identifier of the contact to be updated.</param>
-        /// <param name="contact">The updated contact information.</param>
+        /// <param name="requestDto">The updated contact information.</param>
         /// <returns>The updated contact details.</returns>
         [HttpPut("{id}", Name = "UpdateContact")]
         [ProducesResponseType(typeof(ContactResponseDto), 200)]
         [ProducesResponseType(typeof(ErrorResponse), 404)]
-        public IActionResult Put(string id, [FromBody] Contact contact)
+        public IActionResult Put(string id, [FromBody] ContactRequestDto requestDto)
         {
+            if (string.IsNullOrWhiteSpace(id) || !int.TryParse(id, out _))
+            {
+                return BadRequest("Invalid contact id");
+            }
+
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var dbContact = ContactRepository.GetById(id);
 
-            if (contact == null)
+            if (dbContact == null)
                 return NotFound($"Contact id {id} not found.");
 
+            var contact = Mapper.Map<Contact>(requestDto);
             dbContact = ContactRepository.Update(contact, id);
             return Ok(Mapper.Map<ContactResponseDto>(dbContact));
         }
@@ -99,6 +116,11 @@ namespace ContactsApp.Controllers
         [ProducesResponseType(typeof(ErrorResponse), 404)]
         public IActionResult Delete(string id)
         {
+            if (string.IsNullOrWhiteSpace(id) || !int.TryParse(id, out _))
+            {
+                return BadRequest("Invalid contact id");
+            }
+
             var dbContact = ContactRepository.GetById(id);
 
             if (dbContact == null)

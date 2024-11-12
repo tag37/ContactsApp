@@ -2,6 +2,7 @@
 using ContactsApp.Controllers;
 using ContactsApp.Database.DtabaseEntity;
 using ContactsApp.Database.Interface;
+using ContactsApp.Infrastructure;
 using ContactsApp.ModelDto;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -71,10 +72,11 @@ namespace ContactsApp.UnitTest.Controllers
         {
             var result = _controller.Get("");
 
-            var badRequestResult = result as BadRequestObjectResult;
-            Assert.NotNull(badRequestResult);
-            Assert.Equal(badRequestResult.StatusCode, 400);
-            Assert.Equal(badRequestResult.Value, "Invalid contact id.");
+            var badRequestResult = result as ObjectResult;
+            var response = badRequestResult?.Value as ErrorResponse;
+            Assert.NotNull(response);
+            Assert.Equal("400", response.Status);
+            Assert.Equal("Invalid contact id.", response.Details);
         }
 
         [Fact]
@@ -100,14 +102,17 @@ namespace ContactsApp.UnitTest.Controllers
         public void Put_ShouldReturnOkResult_WithUpdatedContact()
         {
             var contactId = "1";
+            var existingContact = new Contact { Id = 1, FirstName = "Tushar", LastName = "Ghulaxe", Email = "Tushar@example.com" };
             var updatedContact = new Contact { Id = 1, FirstName = "Tushar", LastName = "Ghulaxe", Email = "Tushar.updated@example.com" };
+            var updatedContactReq = new ContactRequestDto { FirstName = "Tushar", LastName = "Ghulaxe", Email = "Tushar.updated@example.com" };
             var updatedContactDto = new ContactResponseDto { Id = 1, FirstName = "Tushar", LastName = "Ghulaxe", Email = "Tushar.updated@example.com" };
 
             _mockContactRepository.GetById(contactId).Returns(updatedContact);
-            _mockContactRepository.Update(updatedContact, contactId).Returns(updatedContact);
+            _mockContactRepository.Update(Arg.Any<Contact>(), contactId).Returns(updatedContact);
             _mockMapper.Map<ContactResponseDto>(updatedContact).Returns(updatedContactDto);
+            _mockMapper.Map<Contact>(Arg.Any<ContactRequestDto>()).Returns(existingContact);
 
-            var result = _controller.Put(contactId, updatedContact);
+            var result = _controller.Put(contactId, updatedContactReq);
 
             var okResult = result as OkObjectResult;
 

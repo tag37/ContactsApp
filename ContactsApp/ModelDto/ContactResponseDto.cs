@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ContactsApp.ModelDto
+﻿namespace ContactsApp.ModelDto
 {
     public class ContactResponseDto
     {
